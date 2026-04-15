@@ -1,0 +1,361 @@
+/* ── Reset & base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 13px;
+  background: #f0f2f5;
+  color: #1a1a2e;
+}
+
+a { color: #1a5276; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Header ─────────────────────────────────────────────────────────────────── */
+.site-header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+  color: #fff;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.site-header .logo { display: flex; align-items: center; gap: 10px; }
+
+.site-header .logo-icon {
+  width: 32px; height: 32px;
+  background: #e94560;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; color: #fff;
+  flex-shrink: 0;
+}
+
+.site-header .logo-text { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+.site-header .logo-sub  { font-size: 10px; color: #a0aec0; margin-top: 1px; }
+
+.header-meta { font-size: 11px; color: #a0aec0; text-align: right; }
+
+.header-right { display: flex; align-items: center; gap: 14px; }
+
+.btn-dashboard {
+  display: inline-block;
+  padding: 5px 13px;
+  background: #e94560;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s;
+  text-decoration: none;
+}
+.btn-dashboard:hover { background: #c73652; text-decoration: none; }
+
+/* ── Layout ─────────────────────────────────────────────────────────────────── */
+.page-wrap {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+/* ── Filter bar ─────────────────────────────────────────────────────────────── */
+.filter-card {
+  background: #fff;
+  border: 1px solid #b0b8c9;
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.filter-card form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.filter-group { display: flex; flex-direction: column; gap: 3px; }
+
+.filter-group label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6b7280;
+  letter-spacing: 0.5px;
+}
+
+.filter-group input,
+.filter-group select {
+  border: 1px solid #b0b8c9;
+  border-radius: 3px;
+  padding: 4px 7px;
+  font-size: 12px;
+  color: #1a1a2e;
+  background: #f9fafb;
+  height: 28px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.filter-group input:focus,
+.filter-group select:focus { border-color: #0f3460; background: #fff; }
+
+.filter-group input  { width: 190px; }
+.filter-group select { min-width: 140px; max-width: 210px; }
+
+.btn-filter {
+  height: 28px; padding: 0 14px;
+  background: #0f3460; color: #fff;
+  border: none; border-radius: 3px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; align-self: flex-end;
+  transition: background 0.15s;
+}
+.btn-filter:hover { background: #16213e; }
+
+.btn-reset {
+  height: 28px; padding: 0 10px;
+  background: #fff; color: #6b7280;
+  border: 1px solid #b0b8c9; border-radius: 3px;
+  font-size: 12px; cursor: pointer; align-self: flex-end;
+  display: flex; align-items: center;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-reset:hover { border-color: #9ca3af; color: #374151; }
+
+/* ── Results bar ────────────────────────────────────────────────────────────── */
+.results-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.results-bar strong { color: #1a1a2e; }
+
+/* ── Toss stats bar ─────────────────────────────────────────────────────────── */
+.toss-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #b0b8c9;
+  border-radius: 4px;
+  padding: 8px 14px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.toss-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-right: 4px;
+}
+
+.toss-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+.toss-stat.bat   { background: #eff6ff; border-color: #bfdbfe; }
+.toss-stat.field { background: #f0fdf4; border-color: #bbf7d0; }
+.toss-stat.avg   { background: #fefce8; border-color: #fde68a; }
+.toss-stat.avg   .toss-pct { color: #b45309; }
+.toss-stat.top10 { background: #fdf2f8; border-color: #f0abfc; }
+.toss-stat.top10 .toss-count { color: #7e22ce; }
+.toss-stat.top25 { background: #faf5ff; border-color: #d8b4fe; }
+.toss-stat.top25 .toss-count { color: #6d28d9; }
+.perc-range { font-weight: 400; color: #9ca3af; font-size: 10px; }
+
+.toss-divider { color: #d1d5db; font-size: 16px; }
+
+.toss-icon { font-size: 13px; }
+
+.toss-text {
+  font-size: 12px;
+  color: #374151;
+}
+
+.toss-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1a2e;
+  padding: 0 4px;
+  border-left: 1px solid #d1d5db;
+  border-right: 1px solid #d1d5db;
+  margin: 0 2px;
+}
+
+.toss-pct {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.toss-stat.bat   .toss-pct { color: #2563eb; }
+.toss-stat.field .toss-pct { color: #059669; }
+
+/* ── Main table wrapper ──────────────────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid #9aa3b2;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* ── Scorecard table ────────────────────────────────────────────────────────── */
+.scorecard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 12px;
+}
+
+/* Header rows */
+.scorecard-table thead tr.row-group th {
+  background: #1a1a2e;
+  color: #e2e8f0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 6px 8px;
+  border: 1px solid #2d3a55;
+  text-align: center;
+}
+
+.scorecard-table thead tr.row-group th.th-meta { background: #1a1a2e; }
+.scorecard-table thead tr.row-group th.th-inn1  { background: #0f3460; }
+.scorecard-table thead tr.row-group th.th-inn2  { background: #1a4a7a; }
+
+.scorecard-table thead tr.row-cols th {
+  background: #f0f4fa;
+  color: #374151;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 5px 8px;
+  border: 1px solid #9aa3b2;
+  white-space: nowrap;
+  text-align: left;
+}
+
+/* Data rows */
+.scorecard-table tbody tr {
+  border-bottom: 1px solid #d1d9e6;
+}
+
+.scorecard-table tbody tr:nth-child(even) { background: #f7f9fc; }
+.scorecard-table tbody tr:nth-child(odd)  { background: #ffffff; }
+.scorecard-table tbody tr:hover { background: #eef3fc; }
+
+.scorecard-table tbody td {
+  padding: 5px 8px;
+  border: 1px solid #d1d9e6;
+  vertical-align: top;
+  line-height: 1.4;
+}
+
+/* Column-specific widths / styles */
+.col-date   { white-space: nowrap; font-size: 11px; color: #4b5563; }
+.col-match  { font-size: 11px; font-weight: 600; color: #0f3460; }
+.col-ground { font-size: 11px; color: #374151; }
+.col-result { font-size: 11px; color: #065f46; font-weight: 600; }
+.col-series { font-size: 10px; color: #6b7280; }
+.col-toss   { font-size: 10px; color: #9ca3af; }
+
+.col-team {
+  font-size: 11px; font-weight: 700;
+  color: #1a1a2e; text-transform: uppercase;
+  letter-spacing: 0.3px; white-space: nowrap;
+}
+
+.col-score {
+  font-size: 13px; font-weight: 800;
+  color: #0f3460; white-space: nowrap;
+  text-align: right;
+}
+
+/* Performer cell */
+.perf-cell { font-size: 11px; }
+.perf-name { font-weight: 600; color: #1e293b; }
+.perf-name.not-out { color: #059669; }
+.perf-stat { color: #4b5563; font-size: 10px; }
+.perf-stat .runs { font-weight: 700; color: #1e293b; }
+.perf-stat .balls { color: #9ca3af; }
+.perf-stat .wkts  { font-weight: 700; color: #dc2626; }
+
+/* Section divider between innings */
+.scorecard-table tbody td.inn-divider {
+  background: #e5eaf3;
+  border-left: 2px solid #9aa3b2;
+}
+
+/* Badge */
+.badge {
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 8px; font-weight: 700;
+  color: #fff; vertical-align: middle;
+  margin-right: 2px;
+}
+.badge-bat  { background: #2563eb; }
+.badge-bowl { background: #dc2626; }
+
+/* empty state */
+.no-data {
+  text-align: center; padding: 48px 0;
+  color: #9ca3af; font-size: 14px;
+}
+
+/* ── Pagination ─────────────────────────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.pg-btn {
+  display: inline-block;
+  padding: 5px 10px;
+  border: 1px solid #b0b8c9;
+  border-radius: 3px;
+  font-size: 12px;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: all 0.12s;
+}
+.pg-btn:hover { background: #f0f4fa; border-color: #9ca3af; text-decoration: none; }
+.pg-btn.active {
+  background: #0f3460; border-color: #0f3460;
+  color: #fff; font-weight: 700; pointer-events: none;
+}
+.pg-btn.disabled { opacity: 0.4; pointer-events: none; }
+.pg-ellipsis { padding: 5px 4px; color: #9ca3af; font-size: 12px; }
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 680px) {
+  .filter-group input { width: 130px; }
+}
