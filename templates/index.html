@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>India T20 Match Stats</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-icon">T20</div>
+    <div>
+      <div class="logo-text">India T20 Match Stats</div>
+      <div class="logo-sub">All T20 matches played in India · 2008 – present</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <a href="http://127.0.0.1:8501" target="_blank" class="btn-dashboard">📊 Dashboard</a>
+    <div class="header-meta">
+      <div>{{ total }} match{{ 'es' if total != 1 else '' }} found</div>
+      <div>Page {{ page }} of {{ total_pages }}</div>
+    </div>
+  </div>
+</header>
+
+<!-- ── Page wrap ────────────────────────────────────────────────────────────── -->
+<div class="page-wrap">
+
+  <!-- ── Filters ──────────────────────────────────────────────────────────── -->
+  <div class="filter-card">
+    <form method="get" action="/">
+      <div class="filter-group">
+        <label>Search</label>
+        <input type="text" name="q" value="{{ q }}" placeholder="Team, player, ground…" />
+      </div>
+      <div class="filter-group">
+        <label>Team</label>
+        <select name="team">
+          <option value="">All teams</option>
+          {% for t in teams %}
+          <option value="{{ t }}" {% if t == sel_team %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Ground</label>
+        <select name="ground">
+          <option value="">All grounds</option>
+          {% for g in grounds %}
+          <option value="{{ g }}" {% if g == sel_ground %}selected{% endif %}>{{ g }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>IPL Venue</label>
+        <select name="ipl_venue">
+          <option value="">— All venues —</option>
+          <option value="__all_ipl__" {% if sel_ipl_venue == '__all_ipl__' %}selected{% endif %}>All IPL venues</option>
+          {% for g in ipl_grounds %}
+          <option value="{{ g }}" {% if g == sel_ipl_venue %}selected{% endif %}>{{ g }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Series</label>
+        <select name="series">
+          <option value="">All series</option>
+          {% for s in series_list %}
+          <option value="{{ s }}" {% if s == sel_series %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Year</label>
+        <select name="year">
+          <option value="">All years</option>
+          {% for y in years %}
+          <option value="{{ y }}" {% if y == sel_year %}selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn-filter">Filter</button>
+      <a href="/" class="btn-reset">Reset</a>
+    </form>
+  </div>
+
+  <!-- ── Results bar ───────────────────────────────────────────────────────── -->
+  <div class="results-bar">
+    <span>
+      Showing <strong>{{ (page - 1) * page_size + 1 }}–{{ [(page * page_size), total] | min }}</strong>
+      of <strong>{{ total }}</strong> matches
+    </span>
+    <span>Ordered by date (most recent first)</span>
+  </div>
+
+  <!-- ── Toss stats bar ──────────────────────────────────────────────────── -->
+  {% if toss_total > 0 %}
+  <div class="toss-stats-bar">
+    {% if avg_first_innings %}
+    <div class="toss-stat avg">
+      <span class="toss-text">Avg 1st Inn</span>
+      <span class="toss-pct">{{ avg_first_innings }}</span>
+    </div>
+    <div class="toss-stat top10">
+      <span class="toss-text">Top 0–10% <span class="perc-range">(≥ {{ p90 }})</span></span>
+      <span class="toss-count">{{ top10_count }}</span>
+      <span class="toss-text">matches</span>
+    </div>
+    <div class="toss-stat top25">
+      <span class="toss-text">Top 10–25% <span class="perc-range">({{ p75 }}–{{ p90 }})</span></span>
+      <span class="toss-count">{{ top10_25_count }}</span>
+      <span class="toss-text">matches</span>
+    </div>
+    <span class="toss-divider">|</span>
+    {% endif %}
+    <span class="toss-label">Toss decisions ({{ toss_total }} matches):</span>
+    <div class="toss-stat bat">
+      <span class="toss-icon">🏏</span>
+      <span class="toss-text">Chose to <strong>Bat</strong></span>
+      <span class="toss-count">{{ bat_count }}</span>
+      <span class="toss-pct">{{ bat_pct }}%</span>
+    </div>
+    <div class="toss-stat field">
+      <span class="toss-icon">🧤</span>
+      <span class="toss-text">Chose to <strong>Field</strong></span>
+      <span class="toss-count">{{ field_count }}</span>
+      <span class="toss-pct">{{ field_pct }}%</span>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Scorecard table ──────────────────────────────────────────────────── -->
+  {% if matches %}
+  <div class="table-wrap">
+  <table class="scorecard-table">
+    <thead>
+      <!-- Group row -->
+      <tr class="row-group">
+        <th class="th-meta" colspan="6">Match Info</th>
+        <th class="th-inn1" colspan="6">1st Innings</th>
+        <th class="th-inn2" colspan="6">2nd Innings</th>
+      </tr>
+      <!-- Column labels -->
+      <tr class="row-cols">
+        <!-- meta -->
+        <th>Date</th>
+        <th>Match</th>
+        <th>Ground</th>
+        <th>Series</th>
+        <th>Toss</th>
+        <th>Result</th>
+        <!-- inn1 -->
+        <th>Team</th>
+        <th>Score</th>
+        <th>Bat 1</th>
+        <th>Bat 2</th>
+        <th>Bowl 1</th>
+        <th>Bowl 2</th>
+        <!-- inn2 -->
+        <th>Team</th>
+        <th>Score</th>
+        <th>Bat 1</th>
+        <th>Bat 2</th>
+        <th>Bowl 1</th>
+        <th>Bowl 2</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in matches %}
+      <tr>
+        <!-- ── Meta ── -->
+        <td class="col-date">{{ m.date_str }}</td>
+        <td class="col-match">{{ m.inn1_team or '—' }} v {{ m.inn2_team or '—' }}<br>
+          <span style="font-weight:400;color:#9ca3af;font-size:10px;">{{ m.title }}</span>
+        </td>
+        <td class="col-ground">{{ m.ground }}</td>
+        <td class="col-series">{{ m.series }}</td>
+        <td class="col-toss">{{ m.toss }}</td>
+        <td class="col-result">{{ m.result }}</td>
+
+        <!-- ── Innings 1 ── -->
+        <td class="col-team">{{ m.inn1_team }}</td>
+        <td class="col-score">{{ m.inn1_score }}</td>
+
+        <td class="perf-cell">
+          {% if m.inn1_bat1_name %}
+            <span class="badge badge-bat">B</span>
+            <span class="perf-name{% if m.inn1_bat1_name.endswith('*') %} not-out{% endif %}">{{ m.inn1_bat1_name }}</span><br>
+            <span class="perf-stat">
+              <span class="runs">{{ m.inn1_bat1_runs }}</span>
+              <span class="balls">({{ m.inn1_bat1_balls }}b)</span>
+            </span>
+          {% endif %}
+        </td>
+        <td class="perf-cell">
+          {% if m.inn1_bat2_name %}
+            <span class="badge badge-bat">B</span>
+            <span class="perf-name{% if m.inn1_bat2_name.endswith('*') %} not-out{% endif %}">{{ m.inn1_bat2_name }}</span><br>
+            <span class="perf-stat">
+              <span class="runs">{{ m.inn1_bat2_runs }}</span>
+              <span class="balls">({{ m.inn1_bat2_balls }}b)</span>
+            </span>
+          {% endif %}
+        </td>
+        <td class="perf-cell">
+          {% if m.inn1_bowl1_name %}
+            <span class="badge badge-bowl">W</span>
+            <span class="perf-name">{{ m.inn1_bowl1_name }}</span><br>
+            <span class="perf-stat">
+              <span class="wkts">{{ m.inn1_bowl1_wickets }}/{{ m.inn1_bowl1_runs }}</span>
+              <span class="balls">({{ m.inn1_bowl1_overs }}ov)</span>
+            </span>
+          {% endif %}
+        </td>
+        <td class="perf-cell">
+          {% if m.inn1_bowl2_name %}
+            <span class="badge badge-bowl">W</span>
+            <span class="perf-name">{{ m.inn1_bowl2_name }}</span><br>
+            <span class="perf-stat">
+              <span class="wkts">{{ m.inn1_bowl2_wickets }}/{{ m.inn1_bowl2_runs }}</span>
+              <span class="balls">({{ m.inn1_bowl2_overs }}ov)</span>
+            </span>
+          {% endif %}
+        </td>
+
+        <!-- ── Innings 2 ── -->
+        <td class="col-team inn-divider">{{ m.inn2_team }}</td>
+        <td class="col-score">{{ m.inn2_score }}</td>
+
+        <td class="perf-cell">
+          {% if m.inn2_bat1_name %}
+            <span class="badge badge-bat">B</span>
+            <span class="perf-name{% if m.inn2_bat1_name.endswith('*') %} not-out{% endif %}">{{ m.inn2_bat1_name }}</span><br>
+            <span class="perf-stat">
+              <span class="runs">{{ m.inn2_bat1_runs }}</span>
+              <span class="balls">({{ m.inn2_bat1_balls }}b)</span>
+            </span>
+          {% endif %}
+        </td>
+        <td class="perf-cell">
+          {% if m.inn2_bat2_name %}
+            <span class="badge badge-bat">B</span>
+            <span class="perf-name{% if m.inn2_bat2_name.endswith('*') %} not-out{% endif %}">{{ m.inn2_bat2_name }}</span><br>
+            <span class="perf-stat">
+              <span class="runs">{{ m.inn2_bat2_runs }}</span>
+              <span class="balls">({{ m.inn2_bat2_balls }}b)</span>
+            </span>
+          {% endif %}
+        </td>
+        <td class="perf-cell">
+          {% if m.inn2_bowl1_name %}
+            <span class="badge badge-bowl">W</span>
+            <span class="perf-name">{{ m.inn2_bowl1_name }}</span><br>
+            <span class="perf-stat">
+              <span class="wkts">{{ m.inn2_bowl1_wickets }}/{{ m.inn2_bowl1_runs }}</span>
+              <span class="balls">({{ m.inn2_bowl1_overs }}ov)</span>
+            </span>
+          {% endif %}
+        </td>
+        <td class="perf-cell">
+          {% if m.inn2_bowl2_name %}
+            <span class="badge badge-bowl">W</span>
+            <span class="perf-name">{{ m.inn2_bowl2_name }}</span><br>
+            <span class="perf-stat">
+              <span class="wkts">{{ m.inn2_bowl2_wickets }}/{{ m.inn2_bowl2_runs }}</span>
+              <span class="balls">({{ m.inn2_bowl2_overs }}ov)</span>
+            </span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  {% else %}
+  <div class="no-data">No matches found for the selected filters.</div>
+  {% endif %}
+
+  <!-- ── Pagination ────────────────────────────────────────────────────────── -->
+  {% if total_pages > 1 %}
+  <nav class="pagination">
+
+    {% set params = [] %}
+    {% if q %}{% set _ = params.append('q=' ~ q) %}{% endif %}
+    {% if sel_team %}{% set _ = params.append('team=' ~ sel_team) %}{% endif %}
+    {% if sel_ground %}{% set _ = params.append('ground=' ~ sel_ground) %}{% endif %}
+    {% if sel_ipl_venue %}{% set _ = params.append('ipl_venue=' ~ sel_ipl_venue) %}{% endif %}
+    {% if sel_series %}{% set _ = params.append('series=' ~ sel_series) %}{% endif %}
+    {% if sel_year %}{% set _ = params.append('year=' ~ sel_year) %}{% endif %}
+    {% set qs = params | join('&') %}
+    {% set sep = '&' if qs else '' %}
+
+    {% if page > 1 %}
+    <a class="pg-btn" href="/?{{ qs }}{{ sep }}page={{ page - 1 }}">‹ Prev</a>
+    {% else %}
+    <span class="pg-btn disabled">‹ Prev</span>
+    {% endif %}
+
+    {% for p in range(1, total_pages + 1) %}
+      {% if p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+        <a class="pg-btn {% if p == page %}active{% endif %}"
+           href="/?{{ qs }}{{ sep }}page={{ p }}">{{ p }}</a>
+      {% elif p == 2 or p == total_pages - 1 %}
+        <span class="pg-ellipsis">…</span>
+      {% endif %}
+    {% endfor %}
+
+    {% if page < total_pages %}
+    <a class="pg-btn" href="/?{{ qs }}{{ sep }}page={{ page + 1 }}">Next ›</a>
+    {% else %}
+    <span class="pg-btn disabled">Next ›</span>
+    {% endif %}
+
+  </nav>
+  {% endif %}
+
+</div><!-- /.page-wrap -->
+
+</body>
+</html>
